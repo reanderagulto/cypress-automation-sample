@@ -4,24 +4,42 @@
 //   })
 // })
 
+Cypress.on('uncaught:exception', (err, runnable) => {
+    // returning false here prevents Cypress from
+    // failing the test
+    return false
+})
+
+
 describe('Finder', () => {
-  it('Visit Website', () => {
-      cy.visit('https://gatsby.agentimage.com/choose-a-website');
-  });
-  it('Find Sales Number', () => {
-      cy.get('a[href="tel:+1.800.979.5799"]').should('exist');
-  });
-  it('Find Support Number', () => {
-      cy.get('a[href="tel:+1.877.317.4111"]').should('exist');
-  });
-  it('Find International Number', () => {
-      cy.get('a[href="tel:+1.310.595.9033"]').should('exist');
-  });
-  
-  it('Find Email info@agentimage.com', () => {
-      cy.get('a[href="mailto:info@agentimage.com"]').should('exist');
-  });
-  it('Find Email business@agentimage.com', () => {
-      cy.get('a[href="mailto:business@agentimage.com"]').should('exist');
-  });
+    const linksWithAgentEmail = []
+    const linksWithBusinessEmail = []
+    const links = require('../fixtures/links.json')
+    links.map((item, index) => {
+        it('Visit Website', () => {
+            cy.visit(item.url);
+        });
+        it('Find Email info@agentimage.com', () => {
+            cy.get('a[href="mailto: info@agentimage.com"]').should('exist').then((e) => {
+                if(e.length === 1){
+                    linksWithAgentEmail.push(item.url)
+                }
+            })
+        });
+        it('Find Email business@agentimage.com', () => {
+            cy.get('a[href="mailto: business@agentimage.com"]').should('exist').then((e) => {
+                if(e.length === 1){
+                    linksWithBusinessEmail.push(item.url)
+                }
+            })
+        });
+    })
+    it('Write Files', () => {
+        linksWithAgentEmail.forEach((item, index) => {
+            cy.writeFile('data/agentemail.txt', `${item}\n`, {flag: 'a+'})
+        })
+        linksWithBusinessEmail.forEach((item, index) => {
+            cy.writeFile('data/businessemail.txt', `${item}\n`, {flag: 'a+'})
+        })
+    })
 }); 
