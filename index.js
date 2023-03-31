@@ -11,16 +11,12 @@ fetch(url)
       let parseString = xml2js.parseString;
       parseString(data, function (err, result) {
         result.urlset.url.map((item, index) => {
-            dataJSON.push(
-                {
-                    url: item.loc[0]
-                }
-            )
+            dataJSON.push({url: item.loc[0]})
         })
       });
       fs.writeFile(
         writePath, 
-        JSON.stringify(dataJSON, null, 2), 
+        JSON.stringify(dataJSON, null, 1), 
         (error) => {
             if (error) {
                 console.log('An error has occurred ', error);
